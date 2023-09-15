@@ -1,9 +1,24 @@
-<script setup>
-import TheWelcome from '../components/TheWelcome.vue'
+<script>
+import TitleBar from '../components/TitleBar.vue';
+export default {
+
+  data() {
+    return {
+      pageTitle: "紹介 | サービス",
+    }
+  },
+  components: {
+    TitleBar,
+  }
+
+}
+
+
 </script>
 
 <template>
   <main>
-    <TheWelcome />
+    <TitleBar :pageTitle="pageTitle" />
+
   </main>
 </template>
