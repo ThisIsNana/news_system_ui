@@ -9,6 +9,7 @@ export default {
   },
   components: {
     TitleBar,
+
   }
 
 }
@@ -19,9 +20,5 @@ export default {
 <template>
   <main>
     <TitleBar :pageTitle="pageTitle" />
-
-
-
-
   </main>
 </template>

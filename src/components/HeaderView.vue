@@ -3,19 +3,20 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      isLogin: false,
+      isLogin: null,
       categories: null,
 
       showAllCategoryAPI: import.meta.env.VITE_SHOW_ALL_CATEGORY,
     }
   },
-  create() {
-    if (sessionStorage.getItem('isLogin')) {
-      this.isLogin = true
+  created() {
+    if (sessionStorage.getItem('isLogin') === true) {
+      this.isLogin = true;
+      console.log(this.isLogin);
     } else {
       this.isLogin = false
+      console.log(this.isLogin);
     }
-
     this.getCategories();
   },
   methods: {
@@ -44,25 +45,18 @@ export default {
 
 <template>
   <header>
-    <!-- 尚未登入 -->
-    <nav v-if="!isLogin">
+    <nav>
       <RouterLink to="/">
         <i class="fa-solid fa-house-chimney fa-sm"></i> ホームページ
       </RouterLink> |
-      <RouterLink to="/login">
+
+      <!-- 尚未登入 -->
+      <RouterLink to="/login" v-if="!isLogin">
         <i class="fa-solid fa-user fa-sm"></i> ログイン
       </RouterLink>
-    </nav>
 
-    <!-- 已登入 -->
-    <nav v-else>
-      <RouterLink to="/">
-        <i class="fa-solid fa-house-chimney fa-sm"></i> ホームページ
-      </RouterLink> |
-      <RouterLink to="/addNews">
-        <i class="fa-solid fa-circle-plus fa-sm"></i> ニュース追加
-      </RouterLink> |
-      <RouterLink to="/" @click="clearLoginSession">
+      <!-- 已登入 -->
+      <RouterLink to="/" v-else @click="clearLoginSession">
         <i class="fa-solid fa-user fa-sm"></i> ログアウト
       </RouterLink>
     </nav>
@@ -82,10 +76,10 @@ export default {
             <RouterLink to="/">サービス</RouterLink>
           </li>
           <!-- v-if="isLogin" -->
-          <li class="isLogin">
+          <li class="isLogin" v-if="isLogin">
             <RouterLink to="/login_category">[ カテゴリ管理 ]</RouterLink>
           </li>
-          <li class="isLogin">
+          <li class="isLogin" v-if="isLogin">
             <RouterLink to="/login_news">[ ニュース編集・追加 ]</RouterLink>
           </li>
         </ol>

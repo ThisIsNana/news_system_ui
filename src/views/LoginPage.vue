@@ -1,6 +1,7 @@
 <script>
 import TitleBar from '../components/TitleBar.vue';
 import axios from 'axios';
+import SwalToast from '../components/SwalToast.vue';
 export default {
 
   data() {
@@ -26,10 +27,24 @@ export default {
       signUpAPI: import.meta.env.VITE_USER_SIGH_UP,
       isExistAccAPI: import.meta.env.VITE_IS_EXIST_ACCOUNT,
 
+      // SWAL2提示
+      popType: "",
+      popTitle: "",
     }
   },
   components: {
     TitleBar,
+    SwalToast,
+  },
+  create() {
+    if (sessionStorage.getItem('isLogin') === true) {
+      this.popType = 'error';
+      this.popTitle = 'すでにログインしました。ホームページに自動リダイレクトします';
+      this.$nextTick(() => {
+        this.$router.push('/')
+      })
+    };
+
   },
   watch: {
     inputAcc(newVal) {
@@ -98,7 +113,120 @@ export default {
         return this.checkPwd2CanUse = false;
       }
       this.checkPwd2CanUse = true;
-    }
+    },
+    // 登入API
+    login() {
+      // 防呆空白
+      if (this.checkNullOrEmpty(this.inputAcc) === false
+        || this.checkNullOrEmpty(this.inputPwd) === false) {
+        this.popType = "error";
+        this.popTitle = "空いているところや規則に合っていないところがありますので、チェックしてください。";
+        this.$nextTick(() => {
+          this.$refs.SwalToast.showPop();
+        });
+      }
+      else {
+        let request = {
+          "user_account": this.inputAcc,
+          "user_password": this.inputPwd
+        }
+
+        axios({
+          method: 'POST',
+          url: this.loginAPI,
+          data: request,
+        })
+          .then(response => {
+            const data = response.data;
+            if (data.message.split(" ")[0] === "X") {
+              // 錯誤時
+              this.popType = "error";
+              this.popTitle = "空いているところや規則に合っていないところがありますので、チェックしてください。";
+              this.$nextTick(() => {
+                this.$refs.SwalToast.showPop();
+              });
+
+            }
+            else {
+              // 成功時
+              this.popType = "success";
+              this.popTitle = "ログイン成功。2秒後ホームページに自動リダイレクトします";
+              this.$nextTick(() => {
+                this.$refs.SwalToast.showPop();
+                setTimeout(() => {
+                  sessionStorage.setItem("isLogin", true)
+                  this.$router.push("/");
+                }, 2000); // = 0.5 秒
+
+              });
+            }
+          })
+          .catch((err) => {
+            console.log("錯誤", err);
+            this.showSwalErrorMixin();
+          })
+
+      }
+
+
+    },
+    // 註冊API
+    signUp() {
+      // 防呆空白、不可使用等
+      if (this.checkNullOrEmpty(this.inputAcc) === false
+        || this.checkNullOrEmpty(this.inputPwd) === false
+        || this.checkNullOrEmpty(this.inputPwd2) === false
+        || this.checkNullOrEmpty(this.inputName) === false
+        || !this.checkAccCanUse
+        || !this.checkPwdCanUse
+        || !this.checkPwd2CanUse) {
+
+        this.popType = "error";
+        this.popTitle = "空いているところや規則に合っていないところがありますので、チェックしてください。";
+        this.$nextTick(() => {
+          this.$refs.SwalToast.showPop();
+        });
+      }
+      else {
+        let request = {
+          "signup_account": this.inputAcc,
+          "signup_password": this.inputPwd,
+          "signup_name": this.inputName
+        }
+
+        axios({
+          method: 'POST',
+          url: this.signUpAPI,
+          data: request,
+        })
+          .then(response => {
+            const data = response.data;
+            console.log(data);
+            this.popType = "success";
+            this.popTitle = "サインアップ成功、ログインしてください。3秒後ログインページにします";
+            this.$nextTick(() => {
+              this.$refs.SwalToast.showPop();
+            });
+          })
+          .catch((err) => {
+            console.log("錯誤", err);
+            this.popType = "error";
+            this.popTitle = "チェックしてください。";
+            this.$nextTick(() => {
+              this.$refs.SwalToast.showPop();
+            });
+          })
+
+      }
+
+    },
+    // 空白檢查
+    checkNullOrEmpty(input) {
+      if (input === null || input === "undefined" || input.trim === "") {
+        return false;
+      }
+      return true;
+    },
   }
 
 }
@@ -110,6 +238,9 @@ export default {
   <main>
     <TitleBar :pageTitle="title" />
     <div class="main">
+
+      <!-- 彈跳提示視窗 -->
+      <SwalToast ref="SwalToast" :popType="popType" :popTitle="popTitle" />
 
       <div class="box">
         <h1 v-if="hadSignUp">{{ loginPageTitle }}</h1>
@@ -130,8 +261,10 @@ export default {
       </div>
 
       <!-- 提示 -->
-      <i class="fa-regular fa-circle-check fa-sm" style="color: #00ad23;" v-if="checkAccCanUse">このアカウントを使用できます</i>
-      <i class="fa-regular fa-circle-xmark fa-sm" style="color: #ad0000;" v-else>アカウントが規則に合っていません</i>
+      <i class="fa-regular fa-circle-check fa-sm" style="color: #00ad23;"
+        v-if="!hadSignUp && checkAccCanUse">このアカウントを使用できます</i>
+      <i class="fa-regular fa-circle-xmark fa-sm" style="color: #ad0000;"
+        v-if="!hadSignUp && !checkAccCanUse">アカウントが規則に合っていません</i>
 
 
 
@@ -141,9 +274,11 @@ export default {
       </div>
 
       <!-- 提示 -->
-      <i class="fa-regular fa-circle-check fa-sm" style="color: #00ad23;" v-if="checkPwdCanUse">このパスワードを使用できます</i>
-      <i class="fa-regular fa-circle-xmark fa-sm" style="color: #ad0000;" v-else>
-        パスワードが規則に合っていません
+      <i class="fa-regular fa-circle-check fa-sm" style="color: #00ad23;"
+        v-if="!hadSignUp && checkPwdCanUse">このパスワードを使用できます
+      </i>
+      <i class="fa-regular fa-circle-xmark fa-sm" style="color: #ad0000;"
+        v-if="!hadSignUp && !checkPwdCanUse">パスワードが規則に合っていません
       </i>
 
 
@@ -168,8 +303,8 @@ export default {
       </div>
 
       <div class="box">
-        <button v-if="hadSignUp" type="button">ログイン</button>
-        <button v-else type="button">サインアップ</button>
+        <button v-if="hadSignUp" type="button" @click="login">ログイン</button>
+        <button v-else type="button" @click="signUp">サインアップ</button>
       </div>
     </div>
 
@@ -185,9 +320,10 @@ export default {
   align-items: center;
   border: 2px solid #857777;
   position: relative;
-  width: 60%;
+  width: 70%;
   margin: auto;
   text-align: center;
+  margin-bottom: 100px;
 
   .tip_box {
     position: absolute;
@@ -229,13 +365,14 @@ export default {
     h3 {
       font-size: 20px;
       padding: 5px;
-      width: 110px;
+      width: 250px;
+
       // text-align-last: justify;
     }
 
     input {
       font-size: 16px;
-      width: 400px;
+      width: 160%;
       height: 30px;
     }
 
