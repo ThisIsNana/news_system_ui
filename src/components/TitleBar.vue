@@ -1,10 +1,5 @@
 <script>
 export default {
-  data() {
-    return {
-      pageTitle: "XXXX"
-    }
-  },
   // 接收外來標題
   props: {
     pageTitle: String,

@@ -4,7 +4,7 @@ export default {
 
   data() {
     return {
-      pageTitle: "最新消息",
+      pageTitle: "ニュース",
     }
   },
   components: {

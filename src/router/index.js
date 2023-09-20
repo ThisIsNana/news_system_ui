@@ -14,11 +14,6 @@ const router = createRouter({
       component: () => import('../views/NewsList.vue')
     },
     {
-      path: '/add_news',
-      name: 'addNews',
-      component: () => import('../views/NewsList.vue')
-    },
-    {
       path: '/login',
       name: 'login',
       component: () => import('../views/LoginPage.vue')
@@ -34,6 +29,22 @@ const router = createRouter({
       component: () => import('../views/LoginNews.vue')
     },
   ]
+})
+
+router.beforeEach((to, from, next) => {
+
+  const isLogin = sessionStorage.getItem('isLogin') === 'true';
+
+  if (!isLogin && (to.name === 'loginCategory' || to.name === 'loginNews')) {
+    // 未登入但試圖訪問 'loginCategory' 或 'loginNews' 頁面，導向登入畫面
+    next('login');
+  } else if (isLogin && to.name === 'login') {
+    // 已登入，但又試圖訪問登入頁面，將會導向首頁
+    next('/');
+  } else {
+    // 其他隨意進入
+    next();
+  }
 })
 
 export default router

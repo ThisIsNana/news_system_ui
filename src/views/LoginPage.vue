@@ -1,7 +1,7 @@
 <script>
 import TitleBar from '../components/TitleBar.vue';
 import axios from 'axios';
-import SwalToast from '../components/SwalToast.vue';
+import SwalToast from '../components/Swal_Toast.vue';
 export default {
 
   data() {
@@ -37,11 +37,14 @@ export default {
     SwalToast,
   },
   create() {
-    if (sessionStorage.getItem('isLogin') === true) {
+    if (sessionStorage.getItem('isLogin') === 'true') {
       this.popType = 'error';
       this.popTitle = 'すでにログインしました。ホームページに自動リダイレクトします';
       this.$nextTick(() => {
-        this.$router.push('/')
+        this.$refs.SwalToast.showPop();
+        setTimeout(() => {
+          this.$router.push('/')
+        }, 1500)
       })
     };
 
@@ -153,11 +156,11 @@ export default {
               this.popTitle = "ログイン成功。2秒後ホームページに自動リダイレクトします";
               this.$nextTick(() => {
                 this.$refs.SwalToast.showPop();
+                sessionStorage.setItem("isLogin", true)
                 setTimeout(() => {
-                  sessionStorage.setItem("isLogin", true)
-                  this.$router.push("/");
-                }, 2000); // = 0.5 秒
-
+                  this.$router.go(0);
+                  this.$router.push('/');
+                }, 2000); // = 2秒
               });
             }
           })
@@ -206,6 +209,9 @@ export default {
             this.popTitle = "サインアップ成功、ログインしてください。3秒後ログインページにします";
             this.$nextTick(() => {
               this.$refs.SwalToast.showPop();
+              setTimeout(() => {
+                this.$router.go(0);
+              }, 3000);
             });
           })
           .catch((err) => {
