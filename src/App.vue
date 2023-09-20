@@ -1,12 +1,22 @@
-<script setup>
+<script>
+import HeaderView from './components/HeaderView.vue';
+import FooterView from './components/FooterView.vue';
 import { RouterLink, RouterView } from 'vue-router'
+export default {
+
+  components: {
+    HeaderView,
+    FooterView,
+  }
+
+}
+
 </script>
 
 <template>
-  <header>
-  </header>
-
+  <HeaderView />
   <RouterView />
+  <FooterView />
 </template>
 
 <style scoped></style>
