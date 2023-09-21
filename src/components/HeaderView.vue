@@ -1,10 +1,8 @@
 <script>
 import axios from 'axios';
-import SwalToast from './Swal_Toast.vue';
 import SwalNormal from './SwalNormal.vue';
 export default {
   components: {
-    SwalToast,
     SwalNormal,
 
   },
@@ -13,6 +11,9 @@ export default {
       isLogin: null,
       categories: null,
       categoryFather: null,
+
+      // 控制categoryBar顯示
+      showCategory: false,
 
       // swal通知
       swalIcon: "",
@@ -91,15 +92,23 @@ export default {
             })
 
             // 將物件轉為陣列
-            this.categories = Object.values(organizedCategories);
+            this.categories = Object.values(categoryObj);
 
             console.log(this.categories);
+            sessionStorage.setItem('categories', JSON.stringify(this.categories))
           }
         })
         .catch((err) => {
           console.log("錯誤", err);
         })
     },
+    //控制CategoryBar顯示
+    showCategoryBar() {
+      this.showCategory = true;
+    },
+    hideCategoryBar() {
+      this.showCategory = false;
+    }
 
   },
 }
@@ -133,14 +142,22 @@ export default {
             <RouterLink to="/">紹介・サービス</RouterLink>
           </li>
           <li>
-            <RouterLink to="/news">ニュース</RouterLink>
-            <div class="categoryBar">
-              <ol v-for="categoryy in categoryFather">
-                <li>{{ categoryy }}</li>
-              </ol>
+            <RouterLink to="/news" @mouseenter="showCategoryBar" @mouseleave="hideCategoryBar">
+              ニュース
+            </RouterLink>
+            <div class="categoryWrapper" @mouseenter="showCategoryBar" @mouseleave="hideCategoryBar">
+              <div class="categoryBar" v-if="showCategory">
+                <ol v-for="category in categories" class="categories">
+                  <li class="father">{{ category.categoryFather }}</li>
+                  <div class="child">
+                    <li v-for="child in category.categoryChild">
+                      {{ child }}
+                    </li>
+                  </div>
+                  <hr>
+                </ol>
+              </div>
             </div>
-
-
           </li>
           <!-- v-if="isLogin" -->
           <li class="isLogin" v-if="isLogin">
@@ -154,14 +171,15 @@ export default {
     </div>
   </header>
   <!-- 彈跳提示視窗 -->
-  <SwalNormal ref="SwalNormal" :swalIcon="swalIcon" :swalTitle="swalTitle" :swalFooter="swalFooter"
-    :swalConfirmButtonText="swalConfirmButtonText" :swalConfirmButtonColor="swalConfirmButtonColor"
-    :swalShowCancelButton="swalShowCancelButton" :swalCancelButtonText="swalCancelButtonText"
-    :swalCancelButtonColor="swalCancelButtonColor" />
+  <SwalNormal ref="SwalNormal" :swalIcon="swalIcon" :swalTitle="swalTitle" :swalConfirmButtonText="swalConfirmButtonText"
+    :swalConfirmButtonColor="swalConfirmButtonColor" :swalShowCancelButton="swalShowCancelButton"
+    :swalCancelButtonText="swalCancelButtonText" :swalCancelButtonColor="swalCancelButtonColor" />
 </template>
 
 <style lang="scss" scoped>
 header {
+  position: relative;
+
   nav {
     background-color: #ffffff;
     display: flex;
@@ -181,48 +199,83 @@ header {
       }
     }
   }
-}
 
 
 
-.header {
-  display: flex;
-  justify-content: start;
-  align-items: center;
-  background-color: #ffffff;
-  height: 100px;
-  box-shadow: 0px 5px 5px #e0d5d5;
-
-  img {
-    margin: 50px;
-    height: 60px;
-  }
-
-  .navBar {
+  .header {
     display: flex;
+    justify-content: start;
+    align-items: center;
+    background-color: #ffffff;
+    height: 100px;
+    box-shadow: 0px 5px 5px #e0d5d5;
 
-    li {
-      color: #443c3c;
-      margin: 10px 10px;
-      font-size: 20px;
-      padding: 5px;
+    img {
+      margin: 50px;
+      height: 60px;
+    }
 
-      a {
+    .navBar {
+      display: flex;
+
+      li {
         color: #443c3c;
+        margin: 10px 10px;
+        font-size: 20px;
+        padding: 5px;
 
-        &:hover {
-          color: #695f5f;
+        a {
+          color: #443c3c;
+
+          &:hover {
+            color: #695f5f;
+          }
+
         }
+      }
 
+      .isLogin {
+        background-color: #beaeae;
+        padding: 5px;
       }
 
     }
+  }
 
-    .isLogin {
-      background-color: #beaeae;
-      padding: 5px;
+  .categoryWrapper {
+    position: relative;
+
+    .categoryBar {
+      width: 430%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      justify-content: center;
+      background-color: #927777b4;
+      border-radius: 5px;
+      padding: 10px;
+      box-shadow: 0px 2px 4px rgba(102, 102, 102, 0.336);
+
+
+      .categories {
+
+        .father {
+          margin: 10px 20px;
+          color: #000000;
+          font-size: 20px;
+          text-align: center;
+          font-weight: bolder;
+        }
+
+        .child {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin: 10px 20px;
+          color: #ffffff;
+        }
+      }
     }
-
   }
 }
 </style>

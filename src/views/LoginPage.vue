@@ -156,7 +156,9 @@ export default {
               this.popTitle = "ログイン成功。2秒後ホームページに自動リダイレクトします";
               this.$nextTick(() => {
                 this.$refs.SwalToast.showPop();
-                sessionStorage.setItem("isLogin", true)
+                sessionStorage.setItem("userAccount", data.user.userAccount);
+                sessionStorage.setItem("userName", data.user.userName);
+                sessionStorage.setItem("isLogin", true);
                 setTimeout(() => {
                   this.$router.go(0);
                   this.$router.push('/');
@@ -319,86 +321,92 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-.main {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  border: 2px solid #857777;
-  position: relative;
-  width: 70%;
+main {
+  width: 90%;
   margin: auto;
-  text-align: center;
-  margin-bottom: 100px;
 
-  .tip_box {
-    position: absolute;
-    top: 60px;
-    right: 0;
+  .main {
+    background-color: #fff;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    color: #857777;
-    font-size: 12px;
+    border: 2px solid #857777;
+    position: relative;
+    width: 100%;
+    margin: auto;
+    text-align: center;
+    margin-bottom: 100px;
 
-    .tips {
+    .tip_box {
+      position: absolute;
+      top: 60px;
+      right: 0;
       display: flex;
-      padding: 5px;
-      margin: 10px;
-      opacity: 0;
-      transition: 0.3s;
-    }
+      justify-content: center;
+      align-items: center;
+      color: #857777;
+      font-size: 12px;
 
-    &:hover {
       .tips {
-        opacity: 1;
+        display: flex;
+        padding: 5px;
+        margin: 10px;
+        opacity: 0;
         transition: 0.3s;
       }
-    }
-  }
 
-
-  .box {
-    display: flex;
-    align-items: center;
-    padding: 5px;
-    margin: 30px 0 10px 0;
-
-    h1 {
-      font-size: 32px;
+      &:hover {
+        .tips {
+          opacity: 1;
+          transition: 0.3s;
+        }
+      }
     }
 
-    h3 {
-      font-size: 20px;
+
+    .box {
+      display: flex;
+      align-items: center;
       padding: 5px;
-      width: 250px;
+      margin: 30px 0 10px 0;
 
-      // text-align-last: justify;
-    }
+      h1 {
+        font-size: 32px;
+      }
 
-    input {
-      font-size: 16px;
-      width: 160%;
-      height: 30px;
-    }
+      h3 {
+        font-size: 20px;
+        padding: 5px;
+        width: 250px;
 
-    a {
-      position: relative;
-      right: 20px;
-    }
+        // text-align-last: justify;
+      }
 
-    button {
-      margin: 50px;
-      padding: 10px 20px;
-      background-color: #857777;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      font-weight: bolder;
-    }
+      input {
+        font-size: 16px;
+        width: 160%;
+        height: 30px;
+      }
 
-    .pwd2check {
-      margin-top: -10px;
+      a {
+        position: relative;
+        right: 20px;
+      }
+
+      button {
+        margin: 50px;
+        padding: 10px 20px;
+        background-color: #857777;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        font-weight: bolder;
+      }
+
+      .pwd2check {
+        margin-top: -10px;
+      }
     }
   }
 }

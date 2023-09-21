@@ -20,12 +20,13 @@ export default {
 .title {
   display: flex;
   align-items: baseline;
-  margin: 30px 50px;
+  margin: auto;
   font-size: 28px;
+  padding: 30px 0;
   // background-color: #dadada;
 
   i {
-    margin: 5px;
+    margin: 5px 5px 5px 30px;
   }
 
   h2 {
